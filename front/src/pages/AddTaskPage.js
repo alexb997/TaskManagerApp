@@ -7,9 +7,11 @@ const AddTaskPage = () => {
     name: "",
     description: "",
     status: "PENDING",
+    dueDate: "",
+    createdDate: new Date(),
   });
   const [error, setError] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,8 +21,10 @@ const AddTaskPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let date = task.dueDate;
+      task.dueDate = new Date(date);
       await instance.post("/tasks", task);
-      navigate("/"); 
+      navigate("/");
     } catch (error) {
       setError("Failed to create task");
     }
@@ -56,6 +60,19 @@ const AddTaskPage = () => {
             value={task.description}
             onChange={handleChange}
             required
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="dueDate" className="form-label">
+            Due Date:
+          </label>
+          <input
+            type="date"
+            id="dueDate"
+            name="dueDate"
+            className="form-control"
+            value={task.dueDate}
+            onChange={handleChange}
           />
         </div>
         <div className="mb-3">

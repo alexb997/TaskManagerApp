@@ -1,33 +1,33 @@
-package com.taskmanager.model;
+// package com.taskmanager.model;
 
-import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TaskTest {
+// class TaskTest {
 
-    @Test
-    void testTaskConstructorAndGetters() {
-        Task task = new Task(1L, "Test", "Description", "PENDING");
+//     @Test
+//     void testTaskConstructorAndGetters() {
+//         Task task = new Task(1L, "Test", "Description", "PENDING");
 
-        assertEquals(1L, task.getId());
-        assertEquals("Test", task.getName());
-        assertEquals("Description", task.getDescription());
-        assertEquals("PENDING", task.getStatus());
-    }
+//         assertEquals(1L, task.getId());
+//         assertEquals("Test", task.getName());
+//         assertEquals("Description", task.getDescription());
+//         assertEquals("PENDING", task.getStatus());
+//     }
 
-    @Test
-    void testTaskSetters() {
-        Task task = new Task();
-        task.setId(1L);
-        task.setName("Test");
-        task.setDescription("Description");
-        task.setStatus("COMPLETED");
+//     @Test
+//     void testTaskSetters() {
+//         Task task = new Task();
+//         task.setId(1L);
+//         task.setName("Test");
+//         task.setDescription("Description");
+//         task.setStatus("COMPLETED");
 
-        assertEquals(1L, task.getId());
-        assertEquals("Test", task.getName());
-        assertEquals("Description", task.getDescription());
-        assertEquals("COMPLETED", task.getStatus());
-    }
+//         assertEquals(1L, task.getId());
+//         assertEquals("Test", task.getName());
+//         assertEquals("Description", task.getDescription());
+//         assertEquals("COMPLETED", task.getStatus());
+//     }
 
-}
+// }

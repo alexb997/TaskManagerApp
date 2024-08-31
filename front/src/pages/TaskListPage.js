@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
-import { Button, Card, Row, Col, Container } from "react-bootstrap";
+import { Card, Row, Col, Container, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import EditTask from "../components/EditTask";
+import { FaFlag, FaLink, FaRegEdit } from "react-icons/fa";
+import { MdOutlineDelete } from "react-icons/md";
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -26,7 +28,7 @@ const TaskListPage = () => {
   const handleDelete = async (id) => {
     try {
       await instance.delete(`/tasks/${id}`);
-      setTasks(tasks.filter((task) => task.id !== id)); // Remove the deleted task from state
+      setTasks(tasks.filter((task) => task.id !== id));
       alert("Task deleted successfully");
     } catch (err) {
       setError("Failed to delete task");
@@ -44,39 +46,259 @@ const TaskListPage = () => {
     );
   };
 
+  const pendingTasks = tasks.filter((task) => task.status === "PENDING");
+  const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
+  const completedTasks = tasks.filter((task) => task.status === "COMPLETED");
+
   return (
     <Container className="mt-4">
-      <h1 className="mb-4">All Tasks</h1>
       {error && <div className="alert alert-danger">{error}</div>}
-      <div className="mb-3">
-        <Link to="/add-task" className="btn btn-success">
-          Add New Task
-        </Link>
-      </div>
+
       <Row xs={1} md={2} lg={3} className="g-4">
-        {tasks.map((task) => (
-          <Col md={4} mb={3} key={task.id}>
-            <Card>
-              <Card.Header as="h5">{task.name}</Card.Header>
-              <Card.Body>
-                <Card.Text>{task.description}</Card.Text>
-                <Card.Text>
-                  <small className="text-muted">Status: {task.status}</small>
-                </Card.Text>
-                <Button
-                  variant="primary"
-                  onClick={() => handleEdit(task)}
-                  className="me-2"
+        <Col md={4}>
+          <Container
+            style={{
+              border: "1px solid #e6e6e6",
+              borderRadius: "8px",
+              padding: "5px",
+              backgroundColor: "#fff",
+              marginBottom: 10,
+            }}
+          >
+            <span
+              style={{
+                margin: 0,
+                fontWeight: "600",
+                color: "#6c757d",
+              }}
+            >
+              Pending{" "}
+              <Badge pill bg="secondary">
+                9
+              </Badge>
+            </span>
+          </Container>
+          {pendingTasks.length > 0 ? (
+            <>
+              {pendingTasks.map((task) => (
+                <Card
+                  key={task.id}
+                  className="shadow-sm p-3 mb-3 bg-white rounded"
                 >
-                  Edit
-                </Button>
-                <Button variant="danger" onClick={() => handleDelete(task.id)}>
-                  Delete
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Task Management Template
+                  </Card.Subtitle>
+                  <Card.Title>
+                    {task.name}
+                    {task.dueDate}
+                    {task.createdDate}
+                  </Card.Title>
+                  <Card.Text>{task.description}</Card.Text>
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="pe-2">
+                      <FaLink className="mr-1" />
+                      <span className="ml-2 mr-3">4</span>
+                    </span>
+                    <span>
+                      <FaFlag className="mr-2 text-danger" />
+                      <span className="ml-2">Jan 20, 12pm</span>
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-end align-items-center">
+                    <FaRegEdit
+                      size={28}
+                      cursor={"pointer"}
+                      onClick={() => handleEdit(task)}
+                    >
+                      Edit
+                    </FaRegEdit>
+                    <MdOutlineDelete
+                      size={32}
+                      cursor={"pointer"}
+                      onClick={() => handleDelete(task.id)}
+                    >
+                      Delete
+                    </MdOutlineDelete>
+                  </div>
+                </Card>
+              ))}
+              <Link
+                to="/add-task"
+                className="d-block mt-3"
+                style={{ textDecoration: "none" }}
+              >
+                <span
+                  className="text-uppercase"
+                  style={{ color: "gray", display: "block" }}
+                >
+                  + New Task
+                </span>
+              </Link>
+            </>
+          ) : (
+            <p>No pending tasks</p>
+          )}
+        </Col>
+        <Col md={4}>
+          <Container
+            style={{
+              border: "1px solid #e6e6e6",
+              borderRadius: "8px",
+              padding: "5px",
+              backgroundColor: "#fff",
+              marginBottom: 10,
+            }}
+          >
+            <span
+              style={{
+                margin: 0,
+                fontWeight: "600",
+                color: "#6c757d",
+              }}
+            >
+              In Progress{" "}
+              <Badge pill bg="secondary">
+                {inProgressTasks.length}
+              </Badge>
+            </span>
+          </Container>
+          {inProgressTasks.length > 0 ? (
+            <>
+              {inProgressTasks.map((task) => (
+                <Card
+                  key={task.id}
+                  className="shadow-sm p-3 mb-3 bg-white rounded"
+                >
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Task Management Template
+                  </Card.Subtitle>
+                  <Card.Title>{task.name}</Card.Title>
+                  <Card.Text>{task.description}</Card.Text>
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="pe-2">
+                      <FaLink className="mr-1" />
+                      <span className="ml-2 mr-3">4</span>
+                    </span>
+                    <span>
+                      <FaFlag className="mr-2 text-danger" />
+                      <span className="ml-2">Jan 20, 12pm</span>
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-end align-items-center">
+                    <FaRegEdit
+                      size={28}
+                      cursor={"pointer"}
+                      onClick={() => handleEdit(task)}
+                    >
+                      Edit
+                    </FaRegEdit>
+                    <MdOutlineDelete
+                      size={32}
+                      cursor={"pointer"}
+                      onClick={() => handleDelete(task.id)}
+                    >
+                      Delete
+                    </MdOutlineDelete>
+                  </div>
+                </Card>
+              ))}
+              <Link
+                to="/add-task"
+                className="d-block mt-3"
+                style={{ textDecoration: "none" }}
+              >
+                <span
+                  className="text-uppercase"
+                  style={{ color: "gray", display: "block" }}
+                >
+                  + New Task
+                </span>
+              </Link>
+            </>
+          ) : (
+            <p>No tasks in progress</p>
+          )}
+        </Col>
+        <Col md={4}>
+          <Container
+            style={{
+              border: "1px solid #e6e6e6",
+              borderRadius: "8px",
+              padding: "5px",
+              backgroundColor: "#fff",
+              marginBottom: 10,
+            }}
+          >
+            <span
+              style={{
+                margin: 0,
+                fontWeight: "600",
+                color: "#6c757d",
+              }}
+            >
+              Completed{" "}
+              <Badge pill bg="secondary">
+                {completedTasks.length}
+              </Badge>
+            </span>
+          </Container>
+          {completedTasks.length > 0 ? (
+            <>
+              {completedTasks.map((task) => (
+                <Card
+                  key={task.id}
+                  className="shadow-sm p-3 mb-3 bg-white rounded"
+                >
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Task Management Template
+                  </Card.Subtitle>
+                  <Card.Title>{task.name}</Card.Title>
+                  <Card.Text>{task.description}</Card.Text>
+                  <div className="d-flex align-items-center mb-2">
+                    <span className="pe-2">
+                      <FaLink className="mr-1" />
+                      <span className="ml-2 mr-3">4</span>
+                    </span>
+                    <span>
+                      <FaFlag className="mr-2 text-danger" />
+                      <span className="ml-2">Jan 20, 12pm</span>
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-end align-items-center">
+                    <FaRegEdit
+                      size={28}
+                      cursor={"pointer"}
+                      onClick={() => handleEdit(task)}
+                    >
+                      Edit
+                    </FaRegEdit>
+                    <MdOutlineDelete
+                      size={32}
+                      cursor={"pointer"}
+                      onClick={() => handleDelete(task.id)}
+                    >
+                      Delete
+                    </MdOutlineDelete>
+                  </div>
+                </Card>
+              ))}
+              <Link
+                to="/add-task"
+                className="d-block mt-3"
+                style={{ textDecoration: "none" }}
+              >
+                <span
+                  className="text-uppercase"
+                  style={{ color: "grey", fontSize: "bold", display: "block" }}
+                >
+                  + New Task
+                </span>
+              </Link>
+            </>
+          ) : (
+            <p>No completed tasks</p>
+          )}
+        </Col>
       </Row>
       <EditTask
         show={showModal}
