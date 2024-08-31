@@ -1,7 +1,7 @@
-package com.personal.taskmanager.controllers;
+package com.taskmanager.controllers;
 
-import com.personal.taskmanager.model.Task;
-import com.personal.taskmanager.service.TaskService;
+import com.taskmanager.model.Task;
+import com.taskmanager.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

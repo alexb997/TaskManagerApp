@@ -16,7 +16,7 @@ services:
   # Spring Boot Backend Service
   backend:
     build:
-      context: ./backend
+      context: ./back
       dockerfile: Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskmanagerdb
@@ -35,7 +35,7 @@ services:
   # React Frontend Service
   frontend:
     build:
-      context: ./frontend
+      context: ./front
       dockerfile: Dockerfile
     ports:
       - "3000:80"

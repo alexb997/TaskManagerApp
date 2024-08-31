@@ -1,4 +1,4 @@
-package com.personal.taskmanager.model;
+package com.taskmanager.model;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
-package com.personal.taskmanager.controllers;
+package com.taskmanager.controllers;
 
-import com.personal.taskmanager.model.Task;
-import com.personal.taskmanager.service.TaskService;
+import com.taskmanager.model.Task;
+import com.taskmanager.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<String> createTask(@RequestBody Task task) {
         taskService.createTask(task);
-        return new ResponseEntity<>("Task created successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Task created successfully", HttpStatus.CREATED);
     }
 
     @GetMapping

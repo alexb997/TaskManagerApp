@@ -1,7 +1,7 @@
-package com.personal.taskmanager.service;
+package com.taskmanager.service;
 
-import com.personal.taskmanager.model.Task;
-import com.personal.taskmanager.repository.TaskRepository;
+import com.taskmanager.model.Task;
+import com.taskmanager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
