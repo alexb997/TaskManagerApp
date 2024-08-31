@@ -15,10 +15,13 @@ public class TaskManagerApplication {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
-            @SuppressWarnings("null")
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:3000");
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:3000") // Adjust if needed
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Specify allowed methods
+                        .allowedHeaders("*") // Allow all headers
+                        .allowCredentials(true); // Allow credentials (cookies, authorization headers, etc.)
             }
         };
     }
