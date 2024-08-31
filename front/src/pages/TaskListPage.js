@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
+import { Button, Card, Row, Col, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const TaskListPage = () => {
@@ -20,7 +21,7 @@ const TaskListPage = () => {
   }, []);
 
   return (
-    <div className="container mt-4">
+    <Container className="mt-4">
       <h1 className="mb-4">All Tasks</h1>
       {error && <div className="alert alert-danger">{error}</div>}
       <div className="mb-3">
@@ -28,22 +29,35 @@ const TaskListPage = () => {
           Add New Task
         </Link>
       </div>
-      <div className="row">
+      <Row xs={1} md={2} lg={3} className="g-4">
         {tasks.map((task) => (
-          <div className="col-md-4 mb-3" key={task.id}>
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{task.name}</h5>
-                <p className="card-text">{task.description}</p>
-                <p className="card-text">
+          <Col md={4} mb={3} key={task._id}>
+            <Card>
+              <Card.Header as="h5">{task.name}</Card.Header>
+              <Card.Body>
+                <Card.Text>{task.description}</Card.Text>
+                <Card.Text>
                   <small className="text-muted">Status: {task.status}</small>
-                </p>
-              </div>
-            </div>
-          </div>
+                </Card.Text>
+                <Button
+                  variant="primary"
+                  onClick={() => alert("Pressed Edit")}
+                  className="me-2"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => alert("Pressed Delete")}
+                >
+                  Delete
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
         ))}
-      </div>
-    </div>
+      </Row>
+    </Container>
   );
 };
 
