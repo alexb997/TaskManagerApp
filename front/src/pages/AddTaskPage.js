@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import instance from '../axios';
 
 const AddTaskPage = () => {
@@ -9,7 +8,6 @@ const AddTaskPage = () => {
         status: 'PENDING'
     });
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,7 +18,6 @@ const AddTaskPage = () => {
         e.preventDefault();
         try {
             await instance.post('/api/tasks', task);
-            navigate('/tasks'); // Redirect to task list or any other page
         } catch (error) {
             setError('Failed to create task');
         }
