@@ -9,9 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +34,8 @@ public class TaskServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        task1 = new Task(1L, "Task 1", "Description 1", "PENDING", LocalDateTime.now(), LocalDateTime.now().plusDays(1));
-        task2 = new Task(2L, "Task 2", "Description 2", "COMPLETED", LocalDateTime.now(), LocalDateTime.now().plusDays(2));
+        task1 = new Task(1L, "Task 1", "Description 1", "PENDING", LocalDateTime.now(), LocalDateTime.now());
+        task2 = new Task(2L, "Task 2", "Description 2", "COMPLETED", LocalDateTime.now(), LocalDateTime.now());
     }
 
     @Test
@@ -75,10 +75,14 @@ public class TaskServiceTest {
 
     @Test
     void testUpdateTask() {
-        Task updatedTaskDetails = new Task(1L, "Updated Task", "Updated Description", "IN_PROGRESS", LocalDateTime.now(), LocalDateTime.now().plusDays(3));
+        LocalDateTime fixedTimestamp = LocalDateTime.of(2024, 9, 1, 15, 37, 50, 455058500);
 
-        when(taskRepository.findById(1L)).thenReturn(Optional.of(task1));
-        when(taskRepository.save(any(Task.class))).thenReturn(updatedTaskDetails);
+        Task updatedTaskDetails = new Task(1L, "Updated Task", "Updated Description", "IN_PROGRESS", fixedTimestamp, fixedTimestamp.plusDays(3));
+
+        Task existingTask = new Task(1L, "Existing Task", "Existing Description", "PENDING", fixedTimestamp, fixedTimestamp.plusDays(3));
+
+        when(taskRepository.findById(1L)).thenReturn(Optional.of(existingTask));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Task updatedTask = taskService.updateTask(1L, updatedTaskDetails);
 
@@ -86,13 +90,16 @@ public class TaskServiceTest {
         assertEquals("Updated Task", updatedTask.getName(), "Updated task name should match");
         assertEquals("Updated Description", updatedTask.getDescription(), "Updated task description should match");
         assertEquals("IN_PROGRESS", updatedTask.getStatus(), "Updated task status should match");
+        assertEquals(fixedTimestamp, updatedTask.getCreatedDate(), "Created date should match the fixed timestamp");
+        assertEquals(fixedTimestamp.plusDays(3), updatedTask.getDueDate(), "Due date should match the fixed timestamp plus 3 days");
+
         verify(taskRepository, times(1)).findById(1L);
-//        verify(taskRepository, times(1)).save(updatedTaskDetails);
+        verify(taskRepository, times(1)).save(updatedTaskDetails);
     }
 
     @Test
     void testUpdateTask_NotFound() {
-        Task updatedTaskDetails = new Task(1L, "Updated Task", "Updated Description", "IN_PROGRESS", LocalDateTime.now(), LocalDateTime.now().plusDays(3));
+        Task updatedTaskDetails = new Task(1L, "Updated Task", "Updated Description", "IN_PROGRESS", LocalDateTime.now(), LocalDateTime.now());
 
         when(taskRepository.findById(1L)).thenReturn(Optional.empty());
 

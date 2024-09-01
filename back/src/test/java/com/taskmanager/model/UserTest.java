@@ -37,7 +37,7 @@ class UserTest {
     @Test
     void testUsernameValidation() {
         User user = new User();
-        user.setUsername(""); // Invalid username
+        user.setUsername("");
         user.setPassword("password123");
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);

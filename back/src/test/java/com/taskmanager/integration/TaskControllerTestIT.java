@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TaskControllerIntegrationTest {
+public class TaskControllerTestIT {
 
     @Autowired
     private TaskRepository taskRepository;
