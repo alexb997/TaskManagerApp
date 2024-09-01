@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
-import { Card, Row, Col, Container, Badge } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Card, Row, Col, Container, Badge, Button } from "react-bootstrap";
 import EditTask from "../components/EditTask";
 import { FaFlag, FaLink, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
@@ -37,6 +36,11 @@ const TaskListPage = () => {
 
   const handleEdit = (task) => {
     setCurrentTask(task);
+    setShowModal(true);
+  };
+
+  const handleAdd = () => {
+    setCurrentTask(null);
     setShowModal(true);
   };
 
@@ -122,18 +126,13 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Link
-                to="/add-task"
-                className="d-block mt-3"
-                style={{ textDecoration: "none" }}
+              <Button
+                variant="light"
+                className="w-100 text-uppercase"
+                onClick={handleAdd}
               >
-                <span
-                  className="text-uppercase"
-                  style={{ color: "gray", display: "block" }}
-                >
-                  + New Task
-                </span>
-              </Link>
+                + New Task
+              </Button>
             </>
           ) : (
             <p>No pending tasks</p>
@@ -202,18 +201,13 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Link
-                to="/add-task"
-                className="d-block mt-3"
-                style={{ textDecoration: "none" }}
+              <Button
+                variant="light"
+                className="w-100 text-uppercase"
+                onClick={handleAdd}
               >
-                <span
-                  className="text-uppercase"
-                  style={{ color: "gray", display: "block" }}
-                >
-                  + New Task
-                </span>
-              </Link>
+                + New Task
+              </Button>
             </>
           ) : (
             <p>No tasks in progress</p>
@@ -282,18 +276,13 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Link
-                to="/add-task"
-                className="d-block mt-3"
-                style={{ textDecoration: "none" }}
+              <Button
+                variant="light"
+                className="w-100 text-uppercase"
+                onClick={handleAdd}
               >
-                <span
-                  className="text-uppercase"
-                  style={{ color: "grey", fontSize: "bold", display: "block" }}
-                >
-                  + New Task
-                </span>
-              </Link>
+                + New Task
+              </Button>
             </>
           ) : (
             <p>No completed tasks</p>
