@@ -1,33 +1,44 @@
-// package com.taskmanager.model;
+package com.taskmanager.model;
 
-// import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Test;
 
-// import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.time.LocalDateTime;
 
-// class TaskTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//     @Test
-//     void testTaskConstructorAndGetters() {
-//         Task task = new Task(1L, "Test", "Description", "PENDING");
+class TaskTest {
 
-//         assertEquals(1L, task.getId());
-//         assertEquals("Test", task.getName());
-//         assertEquals("Description", task.getDescription());
-//         assertEquals("PENDING", task.getStatus());
-//     }
+    @Test
+    void testTaskConstructorAndGetters() {
+        LocalDateTime now = LocalDateTime.now();
+        Task task = new Task(1L, "Test", "Description", "PENDING", now, now.plusDays(1));
 
-//     @Test
-//     void testTaskSetters() {
-//         Task task = new Task();
-//         task.setId(1L);
-//         task.setName("Test");
-//         task.setDescription("Description");
-//         task.setStatus("COMPLETED");
+        assertEquals(1L, task.getId());
+        assertEquals("Test", task.getName());
+        assertEquals("Description", task.getDescription());
+        assertEquals("PENDING", task.getStatus());
+        assertEquals(now, task.getCreatedDate());
+        assertEquals(now.plusDays(1), task.getDueDate());
+    }
 
-//         assertEquals(1L, task.getId());
-//         assertEquals("Test", task.getName());
-//         assertEquals("Description", task.getDescription());
-//         assertEquals("COMPLETED", task.getStatus());
-//     }
+    @Test
+    void testTaskSetters() {
+        Task task = new Task();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime future = now.plusDays(1);
 
-// }
+        task.setId(1L);
+        task.setName("Test");
+        task.setDescription("Description");
+        task.setStatus("COMPLETED");
+        task.setCreatedDate(now);
+        task.setDueDate(future);
+
+        assertEquals(1L, task.getId());
+        assertEquals("Test", task.getName());
+        assertEquals("Description", task.getDescription());
+        assertEquals("COMPLETED", task.getStatus());
+        assertEquals(now, task.getCreatedDate());
+        assertEquals(future, task.getDueDate());
+    }
+}

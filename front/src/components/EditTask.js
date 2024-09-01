@@ -4,11 +4,17 @@ import "../asset/EditComponent.css";
 import instance from "../axios";
 
 const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
+  const getInitialDueDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    return today.toISOString().substring(0, 10);
+  };
+
   const initialTaskState = taskToEdit || {
     name: "",
     description: "",
     status: "PENDING",
-    dueDate: "",
+    dueDate: getInitialDueDate(),
     createdDate: new Date(),
   };
 
@@ -76,7 +82,7 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label className="task-label">Date</Form.Label>
+            <Form.Label className="task-label">Due Date</Form.Label>
             <Form.Control
               type="date"
               name="dueDate"
@@ -90,7 +96,7 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Status</Form.Label>
+            <Form.Label className="task-label">Status</Form.Label>
             <Form.Control
               as="select"
               name="status"
