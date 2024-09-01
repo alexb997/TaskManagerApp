@@ -4,12 +4,14 @@ import { Card, Row, Col, Container, Badge, Button } from "react-bootstrap";
 import EditTask from "../components/EditTask";
 import { FaFlag, FaLink, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
+import LoginModal from "../components/Login";
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -50,6 +52,9 @@ const TaskListPage = () => {
     );
   };
 
+  const handleShowLogin = () => setShowLoginModal(true);
+  const handleCloseLogin = () => setShowLoginModal(false);
+
   const pendingTasks = tasks.filter((task) => task.status === "PENDING");
   const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
   const completedTasks = tasks.filter((task) => task.status === "COMPLETED");
@@ -57,7 +62,11 @@ const TaskListPage = () => {
   return (
     <Container className="mt-4">
       {error && <div className="alert alert-danger">{error}</div>}
+      <Button variant="primary" onClick={handleShowLogin}>
+        Open Login
+      </Button>
 
+      <LoginModal show={showLoginModal} handleClose={handleCloseLogin} />
       <Row xs={1} md={2} lg={3} className="g-4">
         <Col md={4}>
           <Container
