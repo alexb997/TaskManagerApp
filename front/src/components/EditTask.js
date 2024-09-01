@@ -36,13 +36,13 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
   const handleSaveChanges = async () => {
     try {
       if (taskToEdit) {
-        await instance.put(`/tasks/${task.id}`, task);
+        await instance.put(`/api/tasks/${task.id}`, task);
         onSave(task);
       } else {
         task.createdDate = new Date();
         let date = task.dueDate;
         task.dueDate = new Date(date);
-        const response = await instance.post("/tasks", task);
+        const response = await instance.post("/api/tasks", task);
         onSave(response.data);
       }
       handleClose();

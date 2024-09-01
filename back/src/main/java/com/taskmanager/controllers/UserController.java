@@ -2,7 +2,6 @@ package com.taskmanager.controllers;
 
 import com.taskmanager.model.User;
 import com.taskmanager.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,12 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody User user) {
-        userService.createUser(user);
-        return new ResponseEntity<>("User created successfully", HttpStatus.CREATED);
+        try {
+            userService.createUser(user);
+            return new ResponseEntity<>("User created successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Username already exists", HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping
@@ -56,16 +59,6 @@ public class UserController {
             return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        boolean isAuthenticated = userService.authenticateUser(user.getUsername(), user.getPassword());
-        if (isAuthenticated) {
-            return new ResponseEntity<>("User logged in successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
         }
     }
 }

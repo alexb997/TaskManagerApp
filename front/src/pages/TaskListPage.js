@@ -16,7 +16,7 @@ const TaskListPage = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await instance.get("/tasks");
+        const response = await instance.get("/api/tasks");
         setTasks(response.data);
       } catch (err) {
         setError("Failed to fetch tasks");
@@ -28,7 +28,7 @@ const TaskListPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await instance.delete(`/tasks/${id}`);
+      await instance.delete(`/api/tasks/${id}`);
       setTasks(tasks.filter((task) => task.id !== id));
       alert("Task deleted successfully");
     } catch (err) {
@@ -135,17 +135,17 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Button
-                variant="light"
-                className="w-100 text-uppercase"
-                onClick={handleAdd}
-              >
-                + New Task
-              </Button>
             </>
           ) : (
             <p>No pending tasks</p>
           )}
+          <Button
+            variant="light"
+            className="w-100 text-uppercase"
+            onClick={handleAdd}
+          >
+            + New Task
+          </Button>
         </Col>
         <Col md={4}>
           <Container
@@ -210,17 +210,17 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Button
-                variant="light"
-                className="w-100 text-uppercase"
-                onClick={handleAdd}
-              >
-                + New Task
-              </Button>
             </>
           ) : (
             <p>No tasks in progress</p>
           )}
+          <Button
+            variant="light"
+            className="w-100 text-uppercase"
+            onClick={handleAdd}
+          >
+            + New Task
+          </Button>
         </Col>
         <Col md={4}>
           <Container
@@ -285,17 +285,17 @@ const TaskListPage = () => {
                   </div>
                 </Card>
               ))}
-              <Button
-                variant="light"
-                className="w-100 text-uppercase"
-                onClick={handleAdd}
-              >
-                + New Task
-              </Button>
             </>
           ) : (
             <p>No completed tasks</p>
           )}
+          <Button
+            variant="light"
+            className="w-100 text-uppercase"
+            onClick={handleAdd}
+          >
+            + New Task
+          </Button>
         </Col>
       </Row>
       <EditTask
