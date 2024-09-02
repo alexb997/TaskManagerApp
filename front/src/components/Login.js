@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import instance from "../axios";
 import "../asset/LoginModal.css";
@@ -12,8 +12,18 @@ const LoginModal = ({ show, handleClose }) => {
   const [error, setError] = useState("");
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, [show]);
 
   const handleChange = (e) => {
+    setError("");
+    setSuccessMessage("");
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
@@ -25,17 +35,14 @@ const LoginModal = ({ show, handleClose }) => {
       const { token } = response.data;
 
       if (token) {
-        const username = credentials.username;
-        localStorage.setItem("username", username);
+        localStorage.setItem("username", credentials.username);
         localStorage.setItem("token", token);
-        alert(`Login successful. Token: ${token}`);
-
-        handleClose();
+        setIsLoggedIn(true);
       } else {
         throw new Error("Token not received");
       }
     } catch (err) {
-      console.error("Login error:", err); 
+      console.error("Login error:", err);
       setError(
         err.response
           ? err.response.data.error
@@ -48,6 +55,7 @@ const LoginModal = ({ show, handleClose }) => {
     e.preventDefault();
     try {
       const response = await instance.post("/api/users", credentials);
+      alert(response.data);
       setSuccessMessage("User created successfully! You can now log in.");
       setIsCreatingUser(false);
       setError("");
@@ -68,10 +76,18 @@ const LoginModal = ({ show, handleClose }) => {
     setError("");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
+
   return (
     <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title>{isCreatingUser ? "Create Account" : "Login"}</Modal.Title>
+        <Modal.Title>
+          {isCreatingUser ? "Create Account" : isLoggedIn ? "Logout" : "Login"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && (
@@ -85,42 +101,55 @@ const LoginModal = ({ show, handleClose }) => {
           </Alert>
         )}
 
-        <Form
-          onSubmit={isCreatingUser ? handleCreateUser : handleLogin}
-          className="login-form"
-        >
-          <Form.Group controlId="username" className="mb-3">
-            <Form.Label className="login-label">Username</Form.Label>
-            <Form.Control
-              type="text"
-              name="username"
-              value={credentials.username}
-              onChange={handleChange}
-              placeholder="Enter your username"
-              required
-              className="login-input"
-            />
-          </Form.Group>
-          <Form.Group controlId="password" className="mb-3">
-            <Form.Label className="login-label">Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              value={credentials.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-              className="login-input"
-            />
-          </Form.Group>
-          <Button
-            variant="primary"
-            type="submit"
-            className="w-100 login-button"
+        {isLoggedIn ? (
+          <div>
+            <p>Welcome back, {credentials.username}</p>
+            <Button
+              variant="danger"
+              onClick={handleLogout}
+              className="w-100 login-button"
+            >
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <Form
+            onSubmit={isCreatingUser ? handleCreateUser : handleLogin}
+            className="login-form"
           >
-            {isCreatingUser ? "Create Account" : "Login"}
-          </Button>
-        </Form>
+            <Form.Group controlId="username" className="mb-3">
+              <Form.Label className="login-label">Username</Form.Label>
+              <Form.Control
+                type="text"
+                name="username"
+                value={credentials.username}
+                onChange={handleChange}
+                placeholder="Enter your username"
+                required
+                className="login-input"
+              />
+            </Form.Group>
+            <Form.Group controlId="password" className="mb-3">
+              <Form.Label className="login-label">Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+                className="login-input"
+              />
+            </Form.Group>
+            <Button
+              variant="primary"
+              type="submit"
+              className="w-100 login-button"
+            >
+              {isCreatingUser ? "Create Account" : "Login"}
+            </Button>
+          </Form>
+        )}
 
         <div className="text-center mt-3">
           {isCreatingUser ? (
@@ -131,7 +160,7 @@ const LoginModal = ({ show, handleClose }) => {
             >
               Already have an account? Login
             </Button>
-          ) : (
+          ) : !isLoggedIn ? (
             <Button
               variant="link"
               onClick={() => handleCreationSwitch(true)}
@@ -139,7 +168,7 @@ const LoginModal = ({ show, handleClose }) => {
             >
               Don't have an account? Create one
             </Button>
-          )}
+          ) : null}
         </div>
       </Modal.Body>
     </Modal>

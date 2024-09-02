@@ -4,6 +4,7 @@ import "../asset/EditComponent.css";
 import instance from "../axios";
 
 const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
+  const token = localStorage.getItem("token");
   const getInitialDueDate = () => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
@@ -38,7 +39,7 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
   const handleSaveChanges = async () => {
     try {
       if (taskToEdit) {
-        await instance.put(`/api/tasks/${task.id}`, task);
+        await instance.put(`/api/tasks/${taskToEdit.id}`, task);
         onSave(task);
       } else {
         task.createdDate = new Date();
@@ -49,6 +50,10 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
       }
       handleClose();
     } catch (err) {
+      console.error(
+        "Failed to save task",
+        err.response ? err.response.data : err
+      );
       alert("Failed to save task");
     }
   };

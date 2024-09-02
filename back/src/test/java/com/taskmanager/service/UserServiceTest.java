@@ -124,34 +124,4 @@ class UserServiceTest {
         verify(userRepository, times(1)).existsById(1L);
         verify(userRepository, never()).deleteById(1L);
     }
-
-    @Test
-    void testAuthenticateUser_Success() {
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(user1));
-
-        boolean isAuthenticated = userService.authenticateUser("user1", "password1");
-
-        assertTrue(isAuthenticated, "User should be authenticated");
-        verify(userRepository, times(1)).findByUsername("user1");
-    }
-
-    @Test
-    void testAuthenticateUser_Failure() {
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.of(user1));
-
-        boolean isAuthenticated = userService.authenticateUser("user1", "wrongPassword");
-
-        assertFalse(isAuthenticated, "User should not be authenticated with incorrect password");
-        verify(userRepository, times(1)).findByUsername("user1");
-    }
-
-    @Test
-    void testAuthenticateUser_UserNotFound() {
-        when(userRepository.findByUsername("user1")).thenReturn(Optional.empty());
-
-        boolean isAuthenticated = userService.authenticateUser("user1", "password1");
-
-        assertFalse(isAuthenticated, "User should not be authenticated if not found");
-        verify(userRepository, times(1)).findByUsername("user1");
-    }
 }

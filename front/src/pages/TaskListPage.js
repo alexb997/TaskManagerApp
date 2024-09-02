@@ -8,34 +8,41 @@ import LoginModal from "../components/Login";
 import TaskList from "../components/TasksList";
 
 const TaskListPage = () => {
+  const token = localStorage.getItem("token");
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("username")) {
-      let username = localStorage.getItem("username"); // Get the logged-in user's username
-      const fetchTasks = async (username) => {
-        try {
-          const response = await instance.get(`/api/tasks/user/${username}`);
-          setTasks(response.data);
-        } catch (err) {
-          setError("Failed to fetch tasks");
-        }
-      };
+      let username = localStorage.getItem("username");
       fetchTasks(username);
     } else {
       setShowLoginModal(true);
     }
   }, []);
 
+  const fetchTasks = async (username) => {
+    try {
+      const response = await instance.get(`/api/tasks/user/${username}`);
+      setTasks(response.data);
+    } catch (err) {
+      setError("Failed to fetch tasks");
+    }
+  };
+
   const handleDelete = async (id) => {
     try {
       await instance.delete(`/api/tasks/${id}`);
       setTasks(tasks.filter((task) => task.id !== id));
       alert("Task deleted successfully");
+      let updatedUsername = localStorage.getItem("username");
+      if (updatedUsername) {
+        fetchTasks(updatedUsername);
+      }
     } catch (err) {
       setError("Failed to delete task");
     }
@@ -58,11 +65,23 @@ const TaskListPage = () => {
   };
 
   const handleShowLogin = () => setShowLoginModal(true);
-  const handleCloseLogin = () => setShowLoginModal(false);
+  const handleCloseLogin = () => {
+    setShowLoginModal(false);
+    let updatedUsername = localStorage.getItem("username");
+    if (updatedUsername) {
+      fetchTasks(updatedUsername);
+    }
+  };
 
-  const pendingTasks = tasks.filter((task) => task.status === "PENDING");
-  const inProgressTasks = tasks.filter((task) => task.status === "IN_PROGRESS");
-  const completedTasks = tasks.filter((task) => task.status === "COMPLETED");
+  const pendingTasks = tasks
+    ? tasks.filter((task) => task.status === "PENDING")
+    : [];
+  const inProgressTasks = tasks
+    ? tasks.filter((task) => task.status === "IN_PROGRESS")
+    : [];
+  const completedTasks = tasks
+    ? tasks.filter((task) => task.status === "COMPLETED")
+    : [];
 
   return (
     <Container className="mt-4">
@@ -92,7 +111,7 @@ const TaskListPage = () => {
             >
               Pending{" "}
               <Badge pill bg="secondary">
-                9
+                {pendingTasks.length}
               </Badge>
             </span>
           </Container>
@@ -138,10 +157,10 @@ const TaskListPage = () => {
           </Container>
           {inProgressTasks.length > 0 ? (
             <TaskList
-            tasks={inProgressTasks}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
+              tasks={inProgressTasks}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
           ) : (
             <p>No tasks in progress</p>
           )}
@@ -178,10 +197,10 @@ const TaskListPage = () => {
           </Container>
           {completedTasks.length > 0 ? (
             <TaskList
-            tasks={completedTasks}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
+              tasks={completedTasks}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
           ) : (
             <p>No completed tasks</p>
           )}
@@ -196,7 +215,13 @@ const TaskListPage = () => {
       </Row>
       <EditTask
         show={showModal}
-        handleClose={() => setShowModal(false)}
+        handleClose={() => {
+          setShowModal(false);
+          let updatedUsername = localStorage.getItem("username");
+          if (updatedUsername) {
+            fetchTasks(updatedUsername);
+          }
+        }}
         taskToEdit={currentTask}
         onSave={handleSave}
       />
