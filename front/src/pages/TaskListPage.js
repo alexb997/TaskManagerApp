@@ -5,6 +5,7 @@ import EditTask from "../components/EditTask";
 import { FaFlag, FaLink, FaRegEdit } from "react-icons/fa";
 import { MdOutlineDelete } from "react-icons/md";
 import LoginModal from "../components/Login";
+import TaskList from "../components/TasksList";
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,16 +15,20 @@ const TaskListPage = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await instance.get("/api/tasks");
-        setTasks(response.data);
-      } catch (err) {
-        setError("Failed to fetch tasks");
-      }
-    };
-
-    fetchTasks();
+    if (localStorage.getItem("username")) {
+      let username = localStorage.getItem("username"); // Get the logged-in user's username
+      const fetchTasks = async (username) => {
+        try {
+          const response = await instance.get(`/api/tasks/user/${username}`);
+          setTasks(response.data);
+        } catch (err) {
+          setError("Failed to fetch tasks");
+        }
+      };
+      fetchTasks(username);
+    } else {
+      setShowLoginModal(true);
+    }
   }, []);
 
   const handleDelete = async (id) => {
@@ -92,50 +97,11 @@ const TaskListPage = () => {
             </span>
           </Container>
           {pendingTasks.length > 0 ? (
-            <>
-              {pendingTasks.map((task) => (
-                <Card
-                  key={task.id}
-                  className="shadow-sm p-3 mb-3 bg-white rounded"
-                >
-                  <Card.Subtitle className="mb-2 text-muted">
-                    Task Management Template
-                  </Card.Subtitle>
-                  <Card.Title>
-                    {task.name}
-                    {task.dueDate}
-                    {task.createdDate}
-                  </Card.Title>
-                  <Card.Text>{task.description}</Card.Text>
-                  <div className="d-flex align-items-center mb-2">
-                    <span className="pe-2">
-                      <FaLink className="mr-1" />
-                      <span className="ml-2 mr-3">4</span>
-                    </span>
-                    <span>
-                      <FaFlag className="mr-2 text-danger" />
-                      <span className="ml-2">Jan 20, 12pm</span>
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-end align-items-center">
-                    <FaRegEdit
-                      size={28}
-                      cursor={"pointer"}
-                      onClick={() => handleEdit(task)}
-                    >
-                      Edit
-                    </FaRegEdit>
-                    <MdOutlineDelete
-                      size={32}
-                      cursor={"pointer"}
-                      onClick={() => handleDelete(task.id)}
-                    >
-                      Delete
-                    </MdOutlineDelete>
-                  </div>
-                </Card>
-              ))}
-            </>
+            <TaskList
+              tasks={pendingTasks}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
           ) : (
             <p>No pending tasks</p>
           )}
@@ -171,46 +137,11 @@ const TaskListPage = () => {
             </span>
           </Container>
           {inProgressTasks.length > 0 ? (
-            <>
-              {inProgressTasks.map((task) => (
-                <Card
-                  key={task.id}
-                  className="shadow-sm p-3 mb-3 bg-white rounded"
-                >
-                  <Card.Subtitle className="mb-2 text-muted">
-                    Task Management Template
-                  </Card.Subtitle>
-                  <Card.Title>{task.name}</Card.Title>
-                  <Card.Text>{task.description}</Card.Text>
-                  <div className="d-flex align-items-center mb-2">
-                    <span className="pe-2">
-                      <FaLink className="mr-1" />
-                      <span className="ml-2 mr-3">4</span>
-                    </span>
-                    <span>
-                      <FaFlag className="mr-2 text-danger" />
-                      <span className="ml-2">Jan 20, 12pm</span>
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-end align-items-center">
-                    <FaRegEdit
-                      size={28}
-                      cursor={"pointer"}
-                      onClick={() => handleEdit(task)}
-                    >
-                      Edit
-                    </FaRegEdit>
-                    <MdOutlineDelete
-                      size={32}
-                      cursor={"pointer"}
-                      onClick={() => handleDelete(task.id)}
-                    >
-                      Delete
-                    </MdOutlineDelete>
-                  </div>
-                </Card>
-              ))}
-            </>
+            <TaskList
+            tasks={inProgressTasks}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+          />
           ) : (
             <p>No tasks in progress</p>
           )}
@@ -246,46 +177,11 @@ const TaskListPage = () => {
             </span>
           </Container>
           {completedTasks.length > 0 ? (
-            <>
-              {completedTasks.map((task) => (
-                <Card
-                  key={task.id}
-                  className="shadow-sm p-3 mb-3 bg-white rounded"
-                >
-                  <Card.Subtitle className="mb-2 text-muted">
-                    Task Management Template
-                  </Card.Subtitle>
-                  <Card.Title>{task.name}</Card.Title>
-                  <Card.Text>{task.description}</Card.Text>
-                  <div className="d-flex align-items-center mb-2">
-                    <span className="pe-2">
-                      <FaLink className="mr-1" />
-                      <span className="ml-2 mr-3">4</span>
-                    </span>
-                    <span>
-                      <FaFlag className="mr-2 text-danger" />
-                      <span className="ml-2">Jan 20, 12pm</span>
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-end align-items-center">
-                    <FaRegEdit
-                      size={28}
-                      cursor={"pointer"}
-                      onClick={() => handleEdit(task)}
-                    >
-                      Edit
-                    </FaRegEdit>
-                    <MdOutlineDelete
-                      size={32}
-                      cursor={"pointer"}
-                      onClick={() => handleDelete(task.id)}
-                    >
-                      Delete
-                    </MdOutlineDelete>
-                  </div>
-                </Card>
-              ))}
-            </>
+            <TaskList
+            tasks={completedTasks}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+          />
           ) : (
             <p>No completed tasks</p>
           )}

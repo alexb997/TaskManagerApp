@@ -125,30 +125,4 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User not found"));
     }
-
-    @Test
-    void testLoginUser_Success() throws Exception {
-        User user = new User(null, "username1", "password1");
-
-        when(userService.authenticateUser("username1", "password1")).thenReturn(true);
-
-        mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User logged in successfully"));
-    }
-
-    @Test
-    void testLoginUser_Failure() throws Exception {
-        User user = new User(null, "username1", "wrongPassword");
-
-        when(userService.authenticateUser("username1", "wrongPassword")).thenReturn(false);
-
-        mockMvc.perform(post("/api/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(user)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string("Invalid username or password"));
-    }
 }

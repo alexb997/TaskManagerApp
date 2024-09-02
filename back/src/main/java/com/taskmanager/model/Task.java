@@ -24,21 +24,26 @@ public class Task {
     private LocalDateTime createdDate;
     private LocalDateTime dueDate;
 
+    private String creator;
+    private String assignedUser;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id.equals(task.id) &&
-                name.equals(task.name) &&
-                description.equals(task.description) &&
-                status.equals(task.status) &&
-                createdDate.equals(task.createdDate) &&
-                dueDate.equals(task.dueDate);
+        return Objects.equals(id, task.id) &&
+                Objects.equals(name, task.name) &&
+                Objects.equals(description, task.description) &&
+                Objects.equals(status, task.status) &&
+                Objects.equals(createdDate, task.createdDate) &&
+                Objects.equals(dueDate, task.dueDate) &&
+                Objects.equals(creator, task.creator) &&
+                Objects.equals(assignedUser, task.assignedUser);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, status, createdDate, dueDate);
+        return Objects.hash(id, name, description, status, createdDate, dueDate, creator, assignedUser);
     }
 }

@@ -1,10 +1,10 @@
 package com.taskmanager.config;
 
 import com.taskmanager.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,10 +12,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,9 +31,11 @@ import java.io.IOException;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public SecurityConfig(@Lazy UserService userService) {
+    public SecurityConfig(@Lazy UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
@@ -43,7 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/tasks").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/tasks/user/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/tasks").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                 .anyRequest().authenticated()
@@ -78,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter(authenticationManager());
+        CustomAuthenticationFilter filter = new CustomAuthenticationFilter(authenticationManager(), jwtUtil);
         filter.setFilterProcessesUrl("/api/users/login");
         return filter;
     }
@@ -86,23 +87,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         private final ObjectMapper objectMapper = new ObjectMapper();
+        private final JwtUtil jwtUtil;
 
-        public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+        public CustomAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
             setAuthenticationManager(authenticationManager);
+            this.jwtUtil = jwtUtil;
         }
 
         @Override
         public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
             try {
-                // Read JSON payload from the request
                 UserCredentials credentials = objectMapper.readValue(request.getInputStream(), UserCredentials.class);
 
                 String username = credentials.getUsername();
                 String password = credentials.getPassword();
-                System.out.println(username + "Here it is the username asked for !!!");
-                System.out.println(password + "Here it is the username asked for !!!");
 
-                // Create authentication token
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password);
                 return this.getAuthenticationManager().authenticate(authToken);
 
@@ -114,22 +113,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         @Override
         protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                 FilterChain chain, Authentication authResult) throws IOException, ServletException {
+            String username = authResult.getName();
+            String token = jwtUtil.generateToken(username);
+
+            response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("User logged in successfully");
+            response.getWriter().write("{\"token\":\"" + token + "\"}");
         }
 
         @Override
         protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   AuthenticationException failed) throws IOException {
+            response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid username or password");
+            response.getWriter().write("{\"error\":\"Invalid username or password\"}");
         }
     }
+
     private static class UserCredentials {
         private String username;
         private String password;
 
-        // Getters and setters
         public String getUsername() {
             return username;
         }
@@ -146,5 +150,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             this.password = password;
         }
     }
-
 }

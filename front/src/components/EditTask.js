@@ -16,6 +16,8 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
     status: "PENDING",
     dueDate: getInitialDueDate(),
     createdDate: new Date(),
+    creator: localStorage.getItem("username"),
+    assignedUser: "",
   };
 
   const [task, setTask] = useState(initialTaskState);
@@ -107,6 +109,27 @@ const EditTask = ({ show, handleClose, taskToEdit, onSave }) => {
               <option value="IN_PROGRESS">IN_PROGRESS</option>
               <option value="COMPLETED">COMPLETED</option>
             </Form.Control>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="task-label">Assigned User</Form.Label>
+            <Form.Control
+              type="text"
+              name="assignedUser"
+              placeholder="Enter username to assign task"
+              value={task.assignedUser}
+              onChange={handleChange}
+              className="task-input"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label className="task-label">Creator</Form.Label>
+            <Form.Control
+              type="text"
+              name="creator"
+              value={task.creator}
+              readOnly
+              className="task-input"
+            />
           </Form.Group>
         </Form>
       </Modal.Body>

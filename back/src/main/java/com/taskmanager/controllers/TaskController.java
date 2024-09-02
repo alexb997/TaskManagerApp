@@ -21,9 +21,12 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<String> createTask(@RequestBody Task task) {
-
-        taskService.createTask(task);
-        return new ResponseEntity<>("Task created successfully", HttpStatus.CREATED);
+        try {
+            taskService.createTask(task);
+            return new ResponseEntity<>("Task created successfully", HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping
@@ -57,5 +60,23 @@ public class TaskController {
         } else {
             return new ResponseEntity<>("Task not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<Task>> getAllTasksByUsername(@PathVariable String username) {
+        List<Task> tasks = taskService.getAllTasksByUsername(username);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    }
+
+    @GetMapping("/created-by/{username}")
+    public ResponseEntity<List<Task>> getTasksCreatedByUser(@PathVariable String username) {
+        List<Task> tasks = taskService.getTasksCreatedByUser(username);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    }
+
+    @GetMapping("/assigned-to/{username}")
+    public ResponseEntity<List<Task>> getTasksAssignedToUser(@PathVariable String username) {
+        List<Task> tasks = taskService.getTasksAssignedToUser(username);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 }

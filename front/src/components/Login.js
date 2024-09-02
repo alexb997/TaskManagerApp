@@ -22,14 +22,23 @@ const LoginModal = ({ show, handleClose }) => {
     e.preventDefault();
     try {
       const response = await instance.post("/api/users/login", credentials);
-      const username = credentials.username;
-      localStorage.setItem("username", username);
-      alert(response.data);
-      handleClose();
+      const { token } = response.data;
+
+      if (token) {
+        const username = credentials.username;
+        localStorage.setItem("username", username);
+        localStorage.setItem("token", token);
+        alert(`Login successful. Token: ${token}`);
+
+        handleClose();
+      } else {
+        throw new Error("Token not received");
+      }
     } catch (err) {
+      console.error("Login error:", err); 
       setError(
         err.response
-          ? err.response.data
+          ? err.response.data.error
           : "Invalid username or password. Please try again."
       );
     }
@@ -42,6 +51,8 @@ const LoginModal = ({ show, handleClose }) => {
       setSuccessMessage("User created successfully! You can now log in.");
       setIsCreatingUser(false);
       setError("");
+      localStorage.setItem("username", credentials.username);
+      handleClose();
     } catch (err) {
       setError(
         err.response
