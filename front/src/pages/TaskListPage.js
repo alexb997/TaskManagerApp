@@ -1,29 +1,44 @@
 import React, { useEffect, useState } from "react";
 import instance from "../axios";
-import { Card, Row, Col, Container, Badge, Button } from "react-bootstrap";
+import { Row, Col, Container, Badge, Button } from "react-bootstrap";
 import EditTask from "../components/EditTask";
-import { FaFlag, FaLink, FaRegEdit } from "react-icons/fa";
-import { MdOutlineDelete } from "react-icons/md";
 import LoginModal from "../components/Login";
 import TaskList from "../components/TasksList";
+import NotificationModal from "../components/NotificationModal";
 
 const TaskListPage = () => {
-  const token = localStorage.getItem("token");
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
+  const [tasksDueToday, setTasksDueToday] = useState([]);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("username")) {
       let username = localStorage.getItem("username");
       fetchTasks(username);
+      checkTasksDueToday(tasks);
     } else {
       setShowLoginModal(true);
     }
   }, []);
+
+  const checkTasksDueToday = (tasks) => {
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    const dueToday = tasks.filter(
+      (task) =>
+        task.dueDate &&
+        task.dueDate.startsWith(today) &&
+        task.status !== "COMPLETED"
+    );
+    setTasksDueToday(dueToday);
+
+    if (dueToday.length > 0) {
+      setShowNotificationModal(true); // Show modal if tasks are due today
+    }
+  };
 
   const fetchTasks = async (username) => {
     try {
@@ -73,6 +88,10 @@ const TaskListPage = () => {
     }
   };
 
+  const handleCloseNotificationModal = () => {
+    setShowNotificationModal(false);
+  };
+
   const pendingTasks = tasks
     ? tasks.filter((task) => task.status === "PENDING")
     : [];
@@ -91,6 +110,14 @@ const TaskListPage = () => {
       </Button>
 
       <LoginModal show={showLoginModal} handleClose={handleCloseLogin} />
+
+      {/* Notification Modal for Tasks Due Today */}
+      <NotificationModal
+        show={showNotificationModal}
+        handleClose={handleCloseNotificationModal}
+        tasksDueToday={tasksDueToday}
+      />
+
       <Row xs={1} md={2} lg={3} className="g-4">
         <Col md={4}>
           <Container
