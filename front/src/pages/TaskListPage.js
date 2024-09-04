@@ -14,8 +14,10 @@ const TaskListPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [newTasks, setNewTasks] = useState([]);
 
   useEffect(() => {
+    cleanUpLocalStorage();
     if (localStorage.getItem("username")) {
       let username = localStorage.getItem("username");
       fetchTasks(username);
@@ -25,18 +27,49 @@ const TaskListPage = () => {
     }
   }, []);
 
-  const checkTasksDueToday = (tasks) => {
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    const dueToday = tasks.filter(
-      (task) =>
-        task.dueDate &&
-        task.dueDate.startsWith(today) &&
-        task.status !== "COMPLETED"
-    );
-    setTasksDueToday(dueToday);
+  useEffect(() => {
+    if (tasks.length > 0) {
+      checkNewTasks();
+    }
+    checkTasksDueToday(tasks);
+  }, [tasks]);
 
-    if (dueToday.length > 0) {
-      setShowNotificationModal(true); // Show modal if tasks are due today
+  const checkTasksDueToday = (tasks) => {
+    const today = new Date().toISOString().split("T")[0];
+    if (tasks != []) {
+      const dueToday = tasks.filter(
+        (task) =>
+          task.dueDate &&
+          task.dueDate.startsWith(today) &&
+          task.status !== "COMPLETED"
+      );
+      setTasksDueToday(dueToday);
+
+      if (dueToday.length > 0) {
+        setShowNotificationModal(true);
+      }
+    } else {
+      setShowNotificationModal(false);
+    }
+  };
+
+  const checkNewTasks = () => {
+    const username = localStorage.getItem("username");
+    if (!username) return;
+
+    const lastLoginKey = `${username}_lastLoginTime`;
+    const lastLoginTime = localStorage.getItem(lastLoginKey);
+
+    if (lastLoginTime) {
+      const lastLoginDate = new Date(lastLoginTime);
+      const newTasksList = tasks.filter((task) => {
+        const taskDate = new Date(task.createdDate);
+        return taskDate > lastLoginDate;
+      });
+
+      setNewTasks(newTasksList);
+    } else {
+      setNewTasks([]);
     }
   };
 
@@ -86,6 +119,7 @@ const TaskListPage = () => {
     if (updatedUsername) {
       fetchTasks(updatedUsername);
     }
+    setShowNotificationModal(true);
   };
 
   const handleCloseNotificationModal = () => {
@@ -102,6 +136,23 @@ const TaskListPage = () => {
     ? tasks.filter((task) => task.status === "COMPLETED")
     : [];
 
+  const cleanUpLocalStorage = () => {
+    const expirationDays = 30;
+    const now = new Date();
+
+    Object.keys(localStorage).forEach((key) => {
+      if (key.endsWith("_lastLoginTime")) {
+        const lastLoginTime = new Date(localStorage.getItem(key));
+        const daysSinceLastLogin =
+          (now - lastLoginTime) / (1000 * 60 * 60 * 24);
+
+        if (daysSinceLastLogin > expirationDays) {
+          localStorage.removeItem(key);
+        }
+      }
+    });
+  };
+
   return (
     <Container className="mt-4">
       {error && <div className="alert alert-danger">{error}</div>}
@@ -111,7 +162,6 @@ const TaskListPage = () => {
 
       <LoginModal show={showLoginModal} handleClose={handleCloseLogin} />
 
-      {/* Notification Modal for Tasks Due Today */}
       <NotificationModal
         show={showNotificationModal}
         handleClose={handleCloseNotificationModal}
